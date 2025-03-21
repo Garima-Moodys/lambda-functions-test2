@@ -41,17 +41,17 @@ jobs:
     # Step 5: Build Python functions
     - name: Build Python functions
       run: |
-        cd lambda-functions-test2/python
+        cd python
         sam build 
 
     # Step 6: Build C# functions
     - name: Build C# functions
       run: |
-        cd lambda-functions-test2/c-sharp
+        cd c-sharp
         sam build
 
     # Step 7: Build Node.js functions
     - name: Build Node.js functions
       run: |
-        cd lambda-functions-test2/node-js
+        cd node-js
         sam build
