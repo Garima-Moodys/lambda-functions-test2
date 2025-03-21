@@ -30,9 +30,9 @@ jobs:
         python-version: '3.x'  # Change if you're using another version of Python
 
     - name: Set up AWS SAM CLI
-        uses: aws-actions/setup-sam@v2
-        with:
-          use-installer: true
+      uses: aws-actions/setup-sam@v2
+      with:
+        use-installer: true
 
     # Step 6: Build the SAM application
     - name: Build SAM application
