@@ -34,6 +34,20 @@ jobs:
       with:
         use-installer: true
 
-    # Step 6: Build the SAM application
-    - name: Build SAM application
-      run: sam build
+    # Step 5: Build Python functions
+    - name: Build Python functions
+      run: |
+        cd lambda-functions/python
+        sam build --use-container
+
+    # Step 6: Build C# functions
+    - name: Build C# functions
+      run: |
+        cd lambda-functions/csharp
+        sam build
+
+    # Step 7: Build Node.js functions
+    - name: Build Node.js functions
+      run: |
+        cd lambda-functions/nodejs
+        sam build
