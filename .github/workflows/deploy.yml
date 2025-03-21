@@ -42,16 +42,16 @@ jobs:
     - name: Build Python functions
       run: |
         cd python
-        sam build 
+        sam build --use-container
 
     # Step 6: Build C# functions
     - name: Build C# functions
       run: |
         cd c-sharp
-        sam build
+        sam build --use-container
 
     # Step 7: Build Node.js functions
     - name: Build Node.js functions
       run: |
         cd node-js
-        sam build
+        sam build --use-container
