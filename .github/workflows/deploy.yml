@@ -48,10 +48,16 @@ jobs:
     - name: Build C# functions
       run: |
         cd c-sharp
-        sam build --use-container
+        sam build --use-container --mount-with WRITE
 
     # Step 7: Build Node.js functions
     - name: Build Node.js functions
       run: |
         cd node-js
+        sam build --use-container
+
+    # Step 8: Build Java functions
+    - name: Build Java function1
+      run: |
+        cd java
         sam build --use-container
