@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: |
+  node-js
+  Sample SAM Template for node-js
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Function
+      CodeUri: src/Function
+      Handler: index.handler
+      Runtime: nodejs22.x
+      MemorySize: 3008
+      Timeout: 120
+      Tracing: Active
+      Role: arn:aws:iam::933489381270:role/AWSNetworkLambdaServiceRole
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-01979a55a831a51ac
+        SubnetIds:
+          - subnet-06d47cc103b00d8df
+          - subnet-0e06d2b7a43c2f810
+      Environment:
+        Variables:
+          DB_NAME: "LoanDQ"
+          DB_PASSWORD: "ZGY5Nzg0MDg3YWN"
+          DB_SERVER: "ptc-wbafgdb312.ad.moodys.net"
+          DB_USER: "loandq_user"
+          S3_BUCKET_NAME: "aws-lambda-functions-bucket-excel"
+  FunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Function}
+  Function2:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Function2
+      CodeUri: src/Function2
+      Handler: index.handler
+      Runtime: nodejs22.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+  Function2LogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Function2}
