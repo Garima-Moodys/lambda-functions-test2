@@ -29,12 +29,10 @@ jobs:
       with:
         python-version: '3.x'  # Change if you're using another version of Python
 
-    # Step 5: Install SAM CLI
-    - name: Install AWS SAM CLI
-      run: |
-        curl -Lo sam-cli-linux-x86_64.tar.gz https://github.com/aws/aws-sam-cli/releases/download/v1.34.0/aws-sam-cli-linux-x86_64.tar.gz
-        sudo tar -xvzf sam-cli-linux-x86_64.tar.gz -C /usr/local/aws-sam-cli
-        sudo ln -s /usr/local/aws-sam-cli/aws-sam-cli /usr/local/bin/sam
+    - name: Set up AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
 
     # Step 6: Build the SAM application
     - name: Build SAM application
