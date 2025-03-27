@@ -94,7 +94,7 @@ jobs:
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
         changed_functions=""
         for file in $changed_files; do
-          if [[ "$file" == c-sharp/* ]]; then
+          if [[ "$file" == c-sharp/src/* ]]; then
             function_name=$(basename "$file" | cut -d '.' -f 1)
             if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
@@ -119,7 +119,7 @@ jobs:
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
         changed_functions=""
         for file in $changed_files; do
-          if [[ "$file" == java/* ]]; then
+          if [[ "$file" == java/src/* ]]; then
             function_name=$(basename "$file" | cut -d '.' -f 1)
             if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
@@ -144,7 +144,7 @@ jobs:
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
         changed_functions=""
         for file in $changed_files; do
-          if [[ "$file" == node-js/* ]]; then
+          if [[ "$file" == node-js/src/* ]]; then
             function_name=$(basename "$file" | cut -d '.' -f 1)
             if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
