@@ -23,26 +23,36 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    # Step 3: Set up Python environment (if required)
+    # Step 3: Set up Python environment
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x'  # Change if you're using another version of Python
+        python-version: '3.x'  
 
     - name: Set up AWS SAM CLI
       uses: aws-actions/setup-sam@v2
       with:
         use-installer: true
 
-    # Step 4: Print current directory
-    - name: Print current directory
-      run: pwd
+    # Step 4: Cache SAM build dependencies for all languages
+    - name: Cache SAM build
+      uses: actions/cache@v3
+      with:
+        path: |
+          .aws-sam
+          python/.aws-sam
+          node-js/.aws-sam
+          c-sharp/.aws-sam
+          java/.aws-sam
+        key: ${{ runner.os }}-sam-build-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-sam-build-
 
     # Step 5: Build Python functions
     - name: Build Python functions
       run: |
         cd python
-        sam build --use-container
+        sam build --use-container --cached
         sam deploy
 
     # # Step 6: Build C# functions
