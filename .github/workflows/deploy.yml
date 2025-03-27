@@ -34,7 +34,7 @@ jobs:
       with:
         use-installer: true
 
-    # Step 5: Fetch the changed files between commits
+    # Step 4: Fetch the changed files between commits
     - name: Fetch changed files
       id: fetch_changes
       run: |
@@ -61,7 +61,7 @@ jobs:
         # Set the changed files as output
         echo "::set-output name=changed_files::$changed_files"
 
-    # Step 6: Extract folder names from the changed files and build them
+    # Step 5: Build python functions if changed
     - name: Build changed Python functions
       if: contains(steps.fetch_changes.outputs.changed_files, 'python/src')
       run: |
@@ -94,7 +94,7 @@ jobs:
           echo "No changes detected in Python functions"
         fi
 
-    # Step 7: Build C# functions if changed
+    # Step 6: Build C# functions if changed
     - name: Build C# functions
       if: contains(steps.fetch_changes.outputs.changed_files, 'c-sharp/src')
       run: |
@@ -119,11 +119,12 @@ jobs:
           echo "No changes detected in C# functions"
         fi
 
-    # Step 8: Build Java functions if changed
+    # Step 7: Build Java functions if changed
     - name: Build Java functions
-      if: echo contains(steps.fetch_changes.outputs.changed_files, 'java/src')
+      if: contains(steps.fetch_changes.outputs.changed_files, 'java/src')
       run: |
         # Get the list of changed files and filter for Java functions
+        echo "hello"
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
         changed_functions=""
         for file in $changed_files; do
@@ -144,7 +145,7 @@ jobs:
           echo "No changes detected in Java functions"
         fi
 
-    # Step 9: Build Node.js functions if changed
+    # Step 8: Build Node.js functions if changed
     - name: Build Node.js functions
       if: contains(steps.fetch_changes.outputs.changed_files, 'node-js/src')
       run: |
