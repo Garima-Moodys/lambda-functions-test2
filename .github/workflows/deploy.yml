@@ -29,13 +29,12 @@ jobs:
       with:
         python-version: '3.x'  
 
-    
     - name: Set up AWS SAM CLI
       uses: aws-actions/setup-sam@v2
       with:
         use-installer: true
 
-    # Step 4: Determine Changed Python Functions and Build them
+    # Step 4: Build Python Functions
     - name: Determine Changed Python Functions and Build
       run: |
         # Log the before commit SHA and current commit SHA
@@ -91,27 +90,158 @@ jobs:
           echo "No changes detected in functions"
         fi
 
-
     # Step 5: Deploy the updated python functions
-    - name: Deploy Updated Python Functions
+    # - name: Deploy Updated Python Functions
+    #   run: |
+    #     cd python
+    #     sam deploy
+
+    # Step 6: Build C# functions
+    - name: Determine Changed C# Functions and Build
       run: |
-        cd python
-        sam deploy
+        # Log the before commit SHA and current commit SHA for C#
+        echo "Before commit: ${{ github.event.before }}"
+        echo "Current commit: ${{ github.sha }}"
 
-    # # Step 6: Build C# functions
-    # - name: Build C# functions
-    #   run: |
-    #     cd c-sharp
-    #     sam build --use-container --mount-with WRITE
+        before_commit="${{ github.event.before }}"
+        if [ -z "$before_commit" ]; then
+          echo "No before commit, falling back to HEAD~1"
+          before_commit="HEAD~1"
+        fi
+        echo "Using before commit: $before_commit"
 
-    # # Step 7: Build Node.js functions
-    # - name: Build Node.js functions
-    #   run: |
-    #     cd node-js
-    #     sam build --use-container
+        # Fetch full commit history to ensure all commits are available
+        echo "Fetching full commit history..."
+        git fetch --prune --unshallow
 
-    # # Step 8: Build Java functions
-    # - name: Build Java function1
-    #   run: |
-    #     cd java
-    #     sam build --use-container
+        # Get the list of changed files for C#
+        changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
+
+        # Log the changed files
+        echo "Changed files:"
+        echo "$changed_files"
+
+        # Loop through each changed file and check if it's inside the c-sharp directory
+        changed_functions=""
+        for file in $changed_files; do
+          if [[ "$file" == c-sharp/* ]]; then
+            function_name=$(basename "$file" | cut -d '.' -f 1)
+            echo "Processing function: $function_name"
+            if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
+              changed_functions="${changed_functions} ${function_name}"
+            fi
+          fi
+        done
+
+        echo "Changed C# functions to build: $changed_functions"
+
+        # Build only the changed functions for C#
+        if [ -n "$changed_functions" ]; then
+          for function in $changed_functions; do
+            echo "Building C# function: $function"
+            cd c-sharp
+            sam build $function --use-container
+          done
+        else
+          echo "No C# function changes detected"
+        fi
+
+    # Step 7: Build Node.js functions
+    - name: Determine Changed Node.js Functions and Build
+      run: |
+        # Log the before commit SHA and current commit SHA for Node.js
+        echo "Before commit: ${{ github.event.before }}"
+        echo "Current commit: ${{ github.sha }}"
+
+        before_commit="${{ github.event.before }}"
+        if [ -z "$before_commit" ]; then
+          echo "No before commit, falling back to HEAD~1"
+          before_commit="HEAD~1"
+        fi
+        echo "Using before commit: $before_commit"
+
+        # Fetch full commit history to ensure all commits are available
+        echo "Fetching full commit history..."
+        git fetch --prune --unshallow
+
+        # Get the list of changed files for Node.js
+        changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
+
+        # Log the changed files
+        echo "Changed files:"
+        echo "$changed_files"
+
+        # Loop through each changed file and check if it's inside the node-js directory
+        changed_functions=""
+        for file in $changed_files; do
+          if [[ "$file" == node-js/* ]]; then
+            function_name=$(basename "$file" | cut -d '.' -f 1)
+            echo "Processing function: $function_name"
+            if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
+              changed_functions="${changed_functions} ${function_name}"
+            fi
+          fi
+        done
+
+        echo "Changed Node.js functions to build: $changed_functions"
+
+        # Build only the changed functions for Node.js
+        if [ -n "$changed_functions" ]; then
+          for function in $changed_functions; do
+            echo "Building Node.js function: $function"
+            cd node-js
+            sam build $function --use-container
+          done
+        else
+          echo "No Node.js function changes detected"
+        fi
+
+    # Step 8: Build Java functions
+    - name: Determine Changed Java Functions and Build
+      run: |
+        # Log the before commit SHA and current commit SHA for Java
+        echo "Before commit: ${{ github.event.before }}"
+        echo "Current commit: ${{ github.sha }}"
+
+        before_commit="${{ github.event.before }}"
+        if [ -z "$before_commit" ]; then
+          echo "No before commit, falling back to HEAD~1"
+          before_commit="HEAD~1"
+        fi
+        echo "Using before commit: $before_commit"
+
+        # Fetch full commit history to ensure all commits are available
+        echo "Fetching full commit history..."
+        git fetch --prune --unshallow
+
+        # Get the list of changed files for Java
+        changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
+
+        # Log the changed files
+        echo "Changed files:"
+        echo "$changed_files"
+
+        # Loop through each changed file and check if it's inside the java directory
+        changed_functions=""
+        for file in $changed_files; do
+          if [[ "$file" == java/* ]]; then
+            function_name=$(basename "$file" | cut -d '.' -f 1)
+            echo "Processing function: $function_name"
+            if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
+              changed_functions="${changed_functions} ${function_name}"
+            fi
+          fi
+        done
+
+        echo "Changed Java functions to build: $changed_functions"
+
+        # Build only the changed functions for Java
+        if [ -n "$changed_functions" ]; then
+          for function in $changed_functions; do
+            echo "Building Java function: $function"
+            cd java
+            sam build $function --use-container
+          done
+        else
+          echo "No Java function changes detected"
+        fi
