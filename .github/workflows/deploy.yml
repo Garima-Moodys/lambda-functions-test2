@@ -139,14 +139,15 @@ jobs:
     
         # Loop through each changed file and check if it's inside the java/ directory
         echo "Processing changed files..."
-        for file in $changed_files; do
-          echo "$file"
+        # Loop through each changed file, using a while loop with read to handle each file correctly.
+        echo "$changed_files" | while IFS= read -r file; do
+          echo "File: $file"
           if [[ "$file" == java/src/* ]]; then
             echo "hello garima"
-            # Extract function name based on the directory structure
+            # Extract the function name based on the directory structure
             function_name=$(echo "$file" | cut -d '/' -f 3)  # Assuming the function is in the 3rd level directory
             echo "Detected change in Java function: $function_name"
-        
+    
             # Add the function name to the list if not already included
             if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
