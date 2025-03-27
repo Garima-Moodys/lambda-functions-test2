@@ -64,9 +64,6 @@ jobs:
 
     # Step 7: Build Java functions if changed
     - name: Build Java functions if changed
-      if: |
-        # Check if any of the changed files are in the java/src/ directory by using the environment variable
-        echo "${{ env.changed_files }}" | grep -q 'java/src/'
       run: |
         # Convert the output string (changed_files) to an array
         IFS=' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
