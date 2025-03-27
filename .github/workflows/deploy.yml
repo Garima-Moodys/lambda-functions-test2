@@ -119,31 +119,52 @@ jobs:
           echo "No changes detected in C# functions"
         fi
 
+
     # Step 7: Build Java functions if changed
-    - name: Build Java functions
-      if: contains(steps.fetch_changes.outputs.changed_files, 'java/src/*')
+    - name: Build Java functions if changed
+      if: |
+        # Get the list of changed files
+        changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
+
+        # Check if any of the changed files are inside the java/src/ directory
+        echo "$changed_files" | grep -q 'java/src/'
       run: |
+        # Log the start of the step for debugging
+        echo "Starting Java build step"
+
         # Get the list of changed files and filter for Java functions
-        echo "hello"
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
         changed_functions=""
+    
+        # Loop through each changed file and check if it's inside the java/ directory
+        echo "Processing changed files..."
         for file in $changed_files; do
-          if [[ "$file" == java/* ]]; then
-            function_name=$(basename "$file" | cut -d '.' -f 1)
-            if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
-              changed_functions="${changed_functions} ${function_name}"
-            fi
-          fi
+          if [[ "$file" == java/src/* ]]; then
+          # Extract function name based on the directory structure
+          function_name=$(echo "$file" | cut -d '/' -f 3)  # Assuming the function is in the 3rd level directory
+          echo "Detected change in Java function: $function_name"
+        
+        # Add the function name to the list if not already included
+        if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
+          changed_functions="${changed_functions} ${function_name}"
+        fi
+        fi
         done
+
+        # Log the functions that need to be built
+        echo "Changed Java functions to build: $changed_functions"
+
+        # Build only the changed Java functions (if any)
         if [ -n "$changed_functions" ]; then
-          for function in $changed_functions; do
-            echo "Building Java function: $function"
-            cd java
-            sam build $function --use-container
-          done
+        for function in $changed_functions; do
+          echo "Building Java function: $function"
+          cd java
+          sam build $function --use-container
+        done
         else
           echo "No changes detected in Java functions"
         fi
+
 
     # Step 8: Build Node.js functions if changed
     - name: Build Node.js functions
