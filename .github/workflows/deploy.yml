@@ -48,7 +48,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-sam-build-
 
-    # Step 5: Build Python functions
+    # Step 5: Build and Deploy Python functions
     - name: Build Python functions
       run: |
         cd python
