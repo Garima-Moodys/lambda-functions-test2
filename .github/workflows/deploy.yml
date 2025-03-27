@@ -96,7 +96,7 @@ jobs:
 
     # Step 7: Build C# functions if changed
     - name: Build C# functions
-      if: contains(steps.fetch_changes.outputs.changed_files, 'c-sharp')
+      if: contains(steps.fetch_changes.outputs.changed_files, 'c-sharp/src')
       run: |
         # Get the list of changed files and filter for C# functions
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
@@ -121,7 +121,7 @@ jobs:
 
     # Step 8: Build Java functions if changed
     - name: Build Java functions
-      if: contains(steps.fetch_changes.outputs.changed_files, 'java')
+      if: contains(steps.fetch_changes.outputs.changed_files, 'java/src')
       run: |
         # Get the list of changed files and filter for Java functions
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
@@ -146,7 +146,7 @@ jobs:
 
     # Step 9: Build Node.js functions if changed
     - name: Build Node.js functions
-      if: contains(steps.fetch_changes.outputs.changed_files, 'node-js')
+      if: contains(steps.fetch_changes.outputs.changed_files, 'node-js/src')
       run: |
         # Get the list of changed files and filter for Node.js functions
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
