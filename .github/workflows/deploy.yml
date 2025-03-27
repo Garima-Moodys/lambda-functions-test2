@@ -121,7 +121,7 @@ jobs:
 
     # Step 8: Build Java functions if changed
     - name: Build Java functions
-      if: contains(steps.fetch_changes.outputs.changed_files, 'java/src')
+      if: echo contains(steps.fetch_changes.outputs.changed_files, 'java/src')
       run: |
         # Get the list of changed files and filter for Java functions
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
