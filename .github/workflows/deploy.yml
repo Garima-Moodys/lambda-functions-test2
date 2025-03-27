@@ -38,14 +38,23 @@ jobs:
     # Step 4: Determine Changed Python Functions and Build them
     - name: Determine Changed Python Functions and Build
       run: |
+
+        echo "The current commit is: ${{ github.sha }}"
+        echo "The before commit is: ${{ github.event.before }}"
+        
         # Ensure the "before" commit exists. Use HEAD~1 if it's missing (e.g., in case of the first commit).
         before_commit="${{ github.event.before }}"
         if [ -z "$before_commit" ]; then
           before_commit="HEAD~1"
         fi
 
+        
+
+
         # Get the list of changed files between the current commit and the base branch (main)
         changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
+
+
 
         # Loop through each changed file and check if it's inside the src directory
         changed_functions=""
