@@ -134,12 +134,14 @@ jobs:
 
         # Get the list of changed files and filter for Java functions
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
+        echo "$changed_files"
         changed_functions=""
     
         # Loop through each changed file and check if it's inside the java/ directory
         echo "Processing changed files..."
         for file in $changed_files; do
-          if [[ "$file" == java/src/* ]]; then
+          echo "$file"
+          if [[ "$file" == java/src/ ]]; then
             # Extract function name based on the directory structure
             function_name=$(echo "$file" | cut -d '/' -f 3)  # Assuming the function is in the 3rd level directory
             echo "Detected change in Java function: $function_name"
