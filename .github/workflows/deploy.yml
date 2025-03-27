@@ -29,16 +29,23 @@ jobs:
       with:
         python-version: '3.x'  
 
+    
     - name: Set up AWS SAM CLI
       uses: aws-actions/setup-sam@v2
       with:
         use-installer: true
 
-    # Step 4: Determine Changed Python Functions and Build
+    # Step 4: Determine Changed Python Functions and Build them
     - name: Determine Changed Python Functions and Build
       run: |
+        # Ensure the "before" commit exists. Use HEAD~1 if it's missing (e.g., in case of the first commit).
+        before_commit="${{ github.event.before }}"
+        if [ -z "$before_commit" ]; then
+          before_commit="HEAD~1"
+        fi
+
         # Get the list of changed files between the current commit and the base branch (main)
-        changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+        changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
 
         # Loop through each changed file and check if it's inside the src directory
         changed_functions=""
@@ -46,7 +53,8 @@ jobs:
           if [[ "$file" == python/src/* ]]; then
             # Extract the function name from the path and add it to the list of changed functions
             function_name=$(basename "$file" | cut -d '.' -f 1)
-            if [[ ! "${changed_functions} " =~ " ${function_name} " ]]; then
+            # Check if function_name is already in the list of changed functions
+            if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
             fi
           fi
@@ -62,6 +70,7 @@ jobs:
         else
           echo "No changes detected in functions"
         fi
+
 
     # Step 5: Deploy the updated python functions
     - name: Deploy Updated Python Functions
