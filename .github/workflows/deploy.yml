@@ -49,6 +49,10 @@ jobs:
         fi
         echo "Using before commit: $before_commit"
 
+        # Fetch full commit history to ensure all commits are available
+        echo "Fetching full commit history..."
+        git fetch --prune --unshallow
+
         # Get the list of changed files between the before commit and the current commit
         changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
         echo "Changed files:"
