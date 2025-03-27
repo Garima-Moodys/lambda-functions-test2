@@ -58,6 +58,16 @@ jobs:
         echo "Changed files:"
         echo "$changed_files"
         
+        # Convert the changed files into an array
+        IFS=$'\n' read -rd '' -a changed_files_array <<< "$changed_files"
+
+        # Debugging: Log the array (GitHub Actions will display this in logs)
+        echo "Changed files array: ${changed_files_array[@]}"
+
+        # Set the array as output (GitHub Actions stores output as strings, so join array elements into one string)
+        changed_files_string="${changed_files_array[*]}"
+        echo "::set-output name=changed_files::$changed_files_string"
+
         # Set the changed files as output
         echo "::set-output name=changed_files::$changed_files"
 
@@ -129,25 +139,14 @@ jobs:
         # Check if any of the changed files are inside the java/src/ directory
         echo "$changed_files" | grep -q 'java/src/'
       run: |
-        # Log the start of the step for debugging
-        echo "Starting Java build step"
-
-        # Get the list of changed files and filter for Java functions
-        changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
-        echo "$changed_files"
-        changed_functions=""
+        # Convert the output string back into an array
+        IFS=' ' read -r -a changed_files_array <<< "${{ steps.fetch_changes.outputs.changed_files }}"
     
-        # Loop through each changed file and check if it's inside the java/ directory
-        echo "Processing changed files..."
-        # Loop through each changed file, using a while loop with read to handle each file correctly.
-        echo "$changed_files" | while IFS= read -r file; do
-          echo "File: $file"
+        # Loop through the array and check for changes in specific directories
+        for file in "${changed_files_array[@]}"; do
+          echo "Processing file: $file"
           if [[ "$file" == java/src/* ]]; then
-            echo "hello garima"
-            # Extract the function name based on the directory structure
-            function_name=$(echo "$file" | cut -d '/' -f 3)  # Assuming the function is in the 3rd level directory
-            echo "Detected change in Java function: $function_name"
-    
+            echo "Detected change in Java function: $file"
             # Add the function name to the list if not already included
             if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
