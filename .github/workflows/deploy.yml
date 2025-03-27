@@ -60,7 +60,7 @@ jobs:
         echo "$changed_files"
     
         # Set the changed files as output
-        echo "changed_files=$changed_files" >> $GITHUB_ENV
+        echo "$changed_files" | sed 's/^/changed_files=/g' >> $GITHUB_ENV
 
     # Step 7: Build Java functions if changed 
     - name: Build Java functions if changed
