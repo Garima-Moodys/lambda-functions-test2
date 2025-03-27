@@ -61,32 +61,63 @@ jobs:
         # Set the changed files as output
         echo "::set-output name=changed_files::$changed_files"
 
-    # Step 5: Build Python functions if changed
-    - name: Build Python functions
+    # Step 5: Fetch the changed files between commits
+    - name: Fetch changed files
+      id: fetch_changes
+      run: |
+        echo "Before commit: ${{ github.event.before }}"
+        echo "Current commit: ${{ github.sha }}"
+        
+        # Ensure the "before" commit exists. Use HEAD~1 if it's missing (e.g., in case of the first commit).
+        before_commit="${{ github.event.before }}"
+        if [ -z "$before_commit" ]; then
+          echo "No before commit, falling back to HEAD~1"
+          before_commit="HEAD~1"
+        fi
+        echo "Using before commit: $before_commit"
+
+        # Get the list of changed files between the before commit and the current commit
+        changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
+        echo "Changed files:"
+        echo "$changed_files"
+        
+        # Set the changed files as output
+        echo "::set-output name=changed_files::$changed_files"
+
+    # Step 6: Extract folder names from the changed files and build them
+    - name: Build changed Python functions
       if: contains(steps.fetch_changes.outputs.changed_files, 'python/src')
       run: |
-        # Get the list of changed files and filter for Python functions
+        # Get the list of changed files and filter for Python functions inside src
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
-        changed_functions=""
+        changed_folders=""
+        
+        # Loop through each changed file and check if it's inside the python/src directory
         for file in $changed_files; do
           if [[ "$file" == python/src/* ]]; then
-            function_name=$(basename "$file" | cut -d '.' -f 1)
-            if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
-              changed_functions="${changed_functions} ${function_name}"
+            # Extract the folder name from the path (e.g., python/src/folderA -> folderA)
+            folder_name=$(dirname "$file" | sed 's|python/src/||' | cut -d '/' -f 1)
+            if [[ ! " ${changed_folders} " =~ " ${folder_name} " ]]; then
+              changed_folders="${changed_folders} ${folder_name}"
             fi
           fi
         done
-        if [ -n "$changed_functions" ]; then
-          for function in $changed_functions; do
-            echo "Building Python function: $function"
+
+        # Log the folders to be built
+        echo "Changed folders to build: $changed_folders"
+
+        # Build only the changed folders (if any)
+        if [ -n "$changed_folders" ]; then
+          for folder in $changed_folders; do
+            echo "Building functions in folder: $folder"
             cd python
-            sam build $function --use-container
+            sam build src/$folder --use-container
           done
         else
           echo "No changes detected in Python functions"
         fi
 
-    # Step 6: Build C# functions if changed
+    # Step 7: Build C# functions if changed
     - name: Build C# functions
       if: contains(steps.fetch_changes.outputs.changed_files, 'c-sharp')
       run: |
@@ -94,7 +125,7 @@ jobs:
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
         changed_functions=""
         for file in $changed_files; do
-          if [[ "$file" == c-sharp/src/* ]]; then
+          if [[ "$file" == c-sharp/* ]]; then
             function_name=$(basename "$file" | cut -d '.' -f 1)
             if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
@@ -111,7 +142,7 @@ jobs:
           echo "No changes detected in C# functions"
         fi
 
-    # Step 7: Build Java functions if changed
+    # Step 8: Build Java functions if changed
     - name: Build Java functions
       if: contains(steps.fetch_changes.outputs.changed_files, 'java')
       run: |
@@ -119,7 +150,7 @@ jobs:
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
         changed_functions=""
         for file in $changed_files; do
-          if [[ "$file" == java/src/* ]]; then
+          if [[ "$file" == java/* ]]; then
             function_name=$(basename "$file" | cut -d '.' -f 1)
             if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
@@ -136,7 +167,7 @@ jobs:
           echo "No changes detected in Java functions"
         fi
 
-    # Step 8: Build Node.js functions if changed
+    # Step 9: Build Node.js functions if changed
     - name: Build Node.js functions
       if: contains(steps.fetch_changes.outputs.changed_files, 'node-js')
       run: |
@@ -144,7 +175,7 @@ jobs:
         changed_files="${{ steps.fetch_changes.outputs.changed_files }}"
         changed_functions=""
         for file in $changed_files; do
-          if [[ "$file" == node-js/src/* ]]; then
+          if [[ "$file" == node-js/* ]]; then
             function_name=$(basename "$file" | cut -d '.' -f 1)
             if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
