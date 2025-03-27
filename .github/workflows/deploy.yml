@@ -38,23 +38,28 @@ jobs:
     # Step 4: Determine Changed Python Functions and Build them
     - name: Determine Changed Python Functions and Build
       run: |
+        # Log the before commit SHA and current commit SHA
+        echo "Before commit: ${{ github.event.before }}"
+        echo "Current commit: ${{ github.sha }}"
 
-        echo "The current commit is: ${{ github.sha }}"
-        echo "The before commit is: ${{ github.event.before }}"
-        
         # Ensure the "before" commit exists. Use HEAD~1 if it's missing (e.g., in case of the first commit).
         before_commit="${{ github.event.before }}"
         if [ -z "$before_commit" ]; then
+          echo "No before commit, falling back to HEAD~1"
           before_commit="HEAD~1"
         fi
+        echo "Using before commit: $before_commit"
 
-        
-
+        # Fetch the full commit history to ensure all commits are available
+        echo "Fetching full commit history..."
+        git fetch --prune --unshallow
 
         # Get the list of changed files between the current commit and the base branch (main)
         changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
 
-
+        # Log the changed files
+        echo "Changed files:"
+        echo "$changed_files"
 
         # Loop through each changed file and check if it's inside the src directory
         changed_functions=""
@@ -62,12 +67,18 @@ jobs:
           if [[ "$file" == python/src/* ]]; then
             # Extract the function name from the path and add it to the list of changed functions
             function_name=$(basename "$file" | cut -d '.' -f 1)
+            # Log the function name being processed
+            echo "Processing function: $function_name"
+
             # Check if function_name is already in the list of changed functions
             if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
             fi
           fi
         done
+
+        # Log the functions that need to be built
+        echo "Changed functions to build: $changed_functions"
 
         # Build only the changed functions if any
         if [ -n "$changed_functions" ]; then
