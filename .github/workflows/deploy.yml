@@ -62,7 +62,7 @@ jobs:
         # Set the changed files as output
         echo "changed_files=$changed_files" >> $GITHUB_ENV
 
-    # Step 7: Build Java functions if changed
+    # Step 7: Build Java functions if changed 
     - name: Build Java functions if changed
       run: |
         # Convert the output string (changed_files) to an array
