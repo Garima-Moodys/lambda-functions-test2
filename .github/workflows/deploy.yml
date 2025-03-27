@@ -142,7 +142,7 @@ jobs:
         for file in $changed_files; do
           echo "$file"
           if [[ "$file" == java/src/* ]]; then
-            echo "hello"
+            echo "hello garima"
             # Extract function name based on the directory structure
             function_name=$(echo "$file" | cut -d '/' -f 3)  # Assuming the function is in the 3rd level directory
             echo "Detected change in Java function: $function_name"
