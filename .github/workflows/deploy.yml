@@ -34,13 +34,14 @@ jobs:
       with:
         use-installer: true
 
+    
     # Step 4: Fetch the changed files between commits
     - name: Fetch changed files
       id: fetch_changes
       run: |
         echo "Before commit: ${{ github.event.before }}"
         echo "Current commit: ${{ github.sha }}"
-        
+
         # Ensure the "before" commit exists. Use HEAD~1 if it's missing (e.g., in case of the first commit).
         before_commit="${{ github.event.before }}"
         if [ -z "$before_commit" ]; then
@@ -57,19 +58,41 @@ jobs:
         changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
         echo "Changed files:"
         echo "$changed_files"
-        
-        # Convert the changed files into an array
-        IFS=$'\n' read -rd '' -a changed_files_array <<< "$changed_files"
-
-        # Debugging: Log the array (GitHub Actions will display this in logs)
-        echo "Changed files array: ${changed_files_array[@]}"
-
-        # Set the array as output (GitHub Actions stores output as strings, so join array elements into one string)
-        changed_files_string="${changed_files_array[*]}"
-        echo "::set-output name=changed_files::$changed_files_string"
-
+    
         # Set the changed files as output
         echo "::set-output name=changed_files::$changed_files"
+
+    # Step 5: Process the changed files
+    - name: Process Changed Files
+      run: |
+        # Convert the output string back into an array
+        IFS=' ' read -r -a changed_files_array <<< "${{ steps.fetch_changes.outputs.changed_files }}"
+    
+        # Loop through the array and check for changes in specific directories
+        for file in "${changed_files_array[@]}"; do
+          echo "Processing file: $file"
+          if [[ "$file" == java/src/* ]]; then
+            echo "Detected change in Java function: $file"
+            # Add the function name to the list if not already included
+            if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
+              changed_functions="${changed_functions} ${function_name}"
+            fi
+          fi
+        done
+
+        # Log the functions that need to be built
+        echo "Changed Java functions to build: $changed_functions"
+
+        # Build only the changed Java functions (if any)
+        if [ -n "$changed_functions" ]; then
+          for function in $changed_functions; do
+            echo "Building Java function: $function"
+            cd java
+            sam build $function --use-container
+          done
+        else
+          echo "No changes detected in Java functions"
+        fi
 
     # Step 5: Build python functions if changed
     - name: Build changed Python functions
