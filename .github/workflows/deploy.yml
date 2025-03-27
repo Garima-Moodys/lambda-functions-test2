@@ -140,15 +140,15 @@ jobs:
         echo "Processing changed files..."
         for file in $changed_files; do
           if [[ "$file" == java/src/* ]]; then
-          # Extract function name based on the directory structure
-          function_name=$(echo "$file" | cut -d '/' -f 3)  # Assuming the function is in the 3rd level directory
-          echo "Detected change in Java function: $function_name"
+            # Extract function name based on the directory structure
+            function_name=$(echo "$file" | cut -d '/' -f 3)  # Assuming the function is in the 3rd level directory
+            echo "Detected change in Java function: $function_name"
         
-        # Add the function name to the list if not already included
-        if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
-          changed_functions="${changed_functions} ${function_name}"
-        fi
-        fi
+            # Add the function name to the list if not already included
+            if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
+              changed_functions="${changed_functions} ${function_name}"
+            fi
+          fi
         done
 
         # Log the functions that need to be built
@@ -156,11 +156,11 @@ jobs:
 
         # Build only the changed Java functions (if any)
         if [ -n "$changed_functions" ]; then
-        for function in $changed_functions; do
-          echo "Building Java function: $function"
-          cd java
-          sam build $function --use-container
-        done
+          for function in $changed_functions; do
+            echo "Building Java function: $function"
+            cd java
+            sam build $function --use-container
+          done
         else
           echo "No changes detected in Java functions"
         fi
