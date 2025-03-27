@@ -141,7 +141,7 @@ jobs:
         echo "Processing changed files..."
         for file in $changed_files; do
           echo "$file"
-          if [[ "$file" == java/src/ ]]; then
+          if [[ "$file" == java/src/* ]]; then
             echo "hello"
             # Extract function name based on the directory structure
             function_name=$(echo "$file" | cut -d '/' -f 3)  # Assuming the function is in the 3rd level directory
