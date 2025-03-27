@@ -60,7 +60,7 @@ jobs:
         echo "$changed_files"
     
         # Set the changed files as output
-        echo "::set-output name=changed_files::$changed_files"
+        echo "changed_files=$changed_files" >> $GITHUB_ENV
 
 
     # # Step 5: Build python functions if changed
