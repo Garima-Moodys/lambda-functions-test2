@@ -62,6 +62,50 @@ jobs:
         # Set the changed files as output
         echo "changed_files=$changed_files" >> $GITHUB_ENV
 
+    # Step 7: Build Java functions if changed
+    - name: Build Java functions if changed
+      if: |
+        # Check if any of the changed files are in the java/src/ directory by using the environment variable
+        echo "${{ env.changed_files }}" | grep -q 'java/src/'
+      run: |
+        # Convert the output string (changed_files) to an array
+        IFS=' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+
+        # Initialize an empty list to store the changed Java function names
+        changed_functions=""
+
+        # Loop through the array and check for changes in specific directories
+        for file in "${changed_files_array[@]}"; do
+          echo "Processing file: $file"
+      
+          # Check if the file is inside the 'java/src/' directory
+          if [[ "$file" == java/src/* ]]; then
+            # Extract the function name from the file path (assuming function name is a folder or part of the path)
+            function_name=$(echo "$file" | cut -d '/' -f 3)  # Adjust based on your directory structure
+            echo "Detected change in Java function: $function_name"
+
+            # Add the function name to the list if not already included
+            if [[ ! " ${changed_functions} " =~ " ${function_name} " ]]; then
+              changed_functions="${changed_functions} ${function_name}"
+            fi
+          fi
+        done
+
+        # Log the functions that need to be built
+        echo "Changed Java functions to build: $changed_functions"
+
+        # Build only the changed Java functions (if any)
+        if [ -n "$changed_functions" ]; then
+          for function in $changed_functions; do
+            echo "Building Java function: $function"
+            cd java
+            sam build $function --use-container
+          done
+        else
+          echo "No changes detected in Java functions"
+        fi
+
+
 
     # # Step 5: Build python functions if changed
     # - name: Build changed Python functions
