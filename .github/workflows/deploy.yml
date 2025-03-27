@@ -46,7 +46,7 @@ jobs:
           if [[ "$file" == python/src/* ]]; then
             # Extract the function name from the path and add it to the list of changed functions
             function_name=$(basename "$file" | cut -d '.' -f 1)
-            if [[ ! "${changed_functions[@]} " =~ " ${function_name} " ]]; then
+            if [[ ! "${changed_functions} " =~ " ${function_name} " ]]; then
               changed_functions="${changed_functions} ${function_name}"
             fi
           fi
