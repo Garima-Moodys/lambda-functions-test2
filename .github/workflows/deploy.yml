@@ -1,6 +1,6 @@
 name: Deploy SAM Application to AWS
 
-# Trigger the workflow on push to main or any changes in the specified branch
+# Trigger the workflow on push to main 
 on:
   push:
     branches:
@@ -34,25 +34,39 @@ jobs:
       with:
         use-installer: true
 
-    # Step 4: Cache SAM build dependencies for all languages
-    - name: Cache SAM build
-      uses: actions/cache@v3
-      with:
-        path: |
-          .aws-sam
-          python/.aws-sam
-          node-js/.aws-sam
-          c-sharp/.aws-sam
-          java/.aws-sam
-        key: ${{ runner.os }}-sam-build-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-sam-build-
+    # Step 4: Determine Changed Python Functions and Build
+    - name: Determine Changed Python Functions and Build
+      run: |
+        # Get the list of changed files between the current commit and the base branch (main)
+        changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
 
-    # Step 5: Build and Deploy Python functions
-    - name: Build Python functions
+        # Loop through each changed file and check if it's inside the src directory
+        changed_functions=""
+        for file in $changed_files; do
+          if [[ "$file" == python/src/* ]]; then
+            # Extract the function name from the path and add it to the list of changed functions
+            function_name=$(basename "$file" | cut -d '.' -f 1)
+            if [[ ! " ${changed_functions[@]} " =~ " ${function_name} " ]]; then
+              changed_functions="${changed_functions} ${function_name}"
+            fi
+          fi
+        done
+
+        # Build only the changed functions if any
+        if [ -n "$changed_functions" ]; then
+          for function in $changed_functions; do
+            echo "Building function: $function"
+            cd python
+            sam build $function --use-container
+          done
+        else
+          echo "No changes detected in functions"
+        fi
+
+    # Step 5: Deploy the updated python functions
+    - name: Deploy Updated Python Functions
       run: |
         cd python
-        sam build --use-container --cached
         sam deploy
 
     # # Step 6: Build C# functions
