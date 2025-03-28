@@ -232,7 +232,7 @@ jobs:
       run: |
         # Deploy all functions that were built
         cd python
-        sam deploy
+        sam deploy 
         # cd ../c-sharp
         # sam deploy
         # cd ../java
