@@ -228,14 +228,14 @@ jobs:
         fi
 
     # Step 9: Deploy the functions
-    # - name: Deploy Updated Functions
-    #   run: |
-    #     # Deploy all functions that were built
-    #     cd python
-    #     sam deploy
-    #     cd ../c-sharp
-    #     sam deploy
-    #     cd ../java
-    #     sam deploy
-    #     cd ../node-js
-    #     sam deploy
+    - name: Deploy Updated Functions
+      run: |
+        # Deploy all functions that were built
+        cd python
+        sam deploy
+        # cd ../c-sharp
+        # sam deploy
+        # cd ../java
+        # sam deploy
+        # cd ../node-js
+        # sam deploy
