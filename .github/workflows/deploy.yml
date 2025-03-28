@@ -59,14 +59,15 @@ jobs:
         echo "$changed_files"
     
         # Set the changed files as output
-        echo "$changed_files" | sed 's/^/changed_files=/g' >> $GITHUB_ENV
+        echo "changed_files=$changed_files" >> $GITHUB_ENV
+
 
     # Step 5: Build Python functions if changed
     - name: Build Python functions if changed
       run: |
 
         echo "Raw changed files: '${{ env.changed_files }}'"
-        
+
         # Convert the output string (changed_files) to an array
         IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
