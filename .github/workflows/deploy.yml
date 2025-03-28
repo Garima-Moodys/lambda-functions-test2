@@ -65,7 +65,7 @@ jobs:
     - name: Build Python functions if changed
       run: |
         # Convert the output string (changed_files) to an array
-        IFS=' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+        IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
         echo "${changed_files_array}"
         # Initialize an empty array to store the changed Python function names
@@ -106,7 +106,7 @@ jobs:
     - name: Build Java functions if changed
       run: |
         # Convert the output string (changed_files) to an array
-        IFS=' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+        IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
         # Initialize an empty array to store the changed Java function names
         changed_functions=()
@@ -146,7 +146,7 @@ jobs:
     - name: Build Node.js functions if changed
       run: |
         # Convert the output string (changed_files) to an array
-        IFS=' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+        IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
         # Initialize an empty array to store the changed Node.js function names
         changed_functions=()
@@ -186,7 +186,7 @@ jobs:
     - name: Build C# functions if changed
       run: |
         # Convert the output string (changed_files) to an array
-        IFS=' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+        IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
         # Initialize an empty array to store the changed C# function names
         changed_functions=()
