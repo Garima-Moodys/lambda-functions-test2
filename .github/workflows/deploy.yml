@@ -67,7 +67,7 @@ jobs:
         # Convert the output string (changed_files) to an array
         IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
-        echo "${changed_files_array}"
+        echo "${changed_files_array[@]}"
         # Initialize an empty array to store the changed Python function names
         changed_functions=()
 
