@@ -64,6 +64,9 @@ jobs:
     # Step 5: Build Python functions if changed
     - name: Build Python functions if changed
       run: |
+
+        echo "Raw changed files: '${{ env.changed_files }}'"
+        
         # Convert the output string (changed_files) to an array
         IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
