@@ -57,9 +57,12 @@ jobs:
         changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
         echo "Changed files:"
         echo "$changed_files"
-    
-        # Set the changed files as output
-        echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+        # Replace newlines with spaces and sanitize file names
+        sanitized_changed_files=$(echo "$changed_files" | tr '\n' ' ')
+
+        # Set the sanitized list of changed files as an environment variable
+        echo "changed_files=$sanitized_changed_files" >> $GITHUB_ENV
 
 
     # Step 5: Build Python functions if changed
@@ -69,7 +72,7 @@ jobs:
         echo "Raw changed files: '${{ env.changed_files }}'"
 
         # Convert the output string (changed_files) to an array
-        IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+        IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
         echo "${changed_files_array[@]}"
         # Initialize an empty array to store the changed Python function names
@@ -110,7 +113,7 @@ jobs:
     - name: Build Java functions if changed
       run: |
         # Convert the output string (changed_files) to an array
-        IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+        IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
         # Initialize an empty array to store the changed Java function names
         changed_functions=()
@@ -150,7 +153,7 @@ jobs:
     - name: Build Node.js functions if changed
       run: |
         # Convert the output string (changed_files) to an array
-        IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+        IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
         # Initialize an empty array to store the changed Node.js function names
         changed_functions=()
@@ -190,7 +193,7 @@ jobs:
     - name: Build C# functions if changed
       run: |
         # Convert the output string (changed_files) to an array
-        IFS=$'\n' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+        IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
         # Initialize an empty array to store the changed C# function names
         changed_functions=()
