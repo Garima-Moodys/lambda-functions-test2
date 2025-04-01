@@ -12,7 +12,7 @@ Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: python-function-1
+      FunctionName: python-function1-sam-test
       Description: !Sub
         - Stack ${AWS::StackName} Function ${ResourceName}
         - ResourceName: Function
