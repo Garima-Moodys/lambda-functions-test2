@@ -40,7 +40,6 @@ Resources:
           s3_bucket_name: "aws-lambda-functions-bucket-excel"
   FunctionLogGroup:
     Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${Function}
   
