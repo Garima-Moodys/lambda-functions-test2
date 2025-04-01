@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "python"
+stack_name = "c-sharp"
 
 [default.build.parameters]
 cached = true
