@@ -221,7 +221,7 @@ jobs:
           for function in "${changed_functions[@]}"; do
             echo "Building C# function: $function"
             cd c-sharp
-            sam build $function --use-container --no-interactive
+            sam build $function --use-container --mount-with WRITE
           done
         else
           echo "No changes detected in C# functions"
