@@ -35,9 +35,5 @@ Resources:
           server: "ptc-wbafgdb312.ad.moodys.net"
           userid: "loandq_user"
           s3_bucket_name: "aws-lambda-functions-bucket-excel"
-  Function2LogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${Function2}
+  
   
