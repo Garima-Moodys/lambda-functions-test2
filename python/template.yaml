@@ -39,8 +39,8 @@ Resources:
           DB_SERVER: "ptc-wbafgdb312"
           DB_USER: "loandq_user"
           s3_bucket_name: "aws-lambda-functions-bucket-excel"
-  FunctionLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${Function}
+  # FunctionLogGroup:
+  #   Type: AWS::Logs::LogGroup
+  #   Properties:
+  #     LogGroupName: !Sub /aws/lambda/${Function}
   
