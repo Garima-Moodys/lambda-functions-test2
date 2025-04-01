@@ -41,7 +41,6 @@ public class Function
 
             reader = cmd.ExecuteReader();
 
-            //excel package
             package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Stored procedure Dummy_sp data");
 
