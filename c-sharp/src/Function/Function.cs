@@ -34,6 +34,7 @@ public class Function
  
             con.Open();
 
+            //test comment
             cmd = new SqlCommand("dbo.Dummy_sp", con)
             {
                 CommandType = CommandType.StoredProcedure
