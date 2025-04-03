@@ -234,7 +234,7 @@ jobs:
         # cd python
         # sam build --use-container
         # sam deploy 
-        cd ../c-sharp
+        cd c-sharp
         sam build --use-container
         sam deploy
         # cd ../java
