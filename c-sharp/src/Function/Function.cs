@@ -105,7 +105,7 @@ public class Function
             stream?.Dispose();
         }
 
-        return CreateResponse(200, "Connection successful and file uploaded successfully");
+        return CreateResponse(200, "Connection successful and file uploaded successfully to S3");
     }
 
     private static string CreateResponse(int statusCode, string message)
