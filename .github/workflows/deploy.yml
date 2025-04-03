@@ -1,6 +1,5 @@
 name: Deploy SAM Application to AWS
 
-# Trigger the workflow on push to main
 on:
   push:
     branches:
@@ -34,209 +33,226 @@ jobs:
       with:
         use-installer: true
 
-    # # Step 4: Fetch the changed files between commits
-    # - name: Fetch changed files
-    #   id: fetch_changes
-    #   run: |
-    #     echo "Before commit: ${{ github.event.before }}"
-    #     echo "Current commit: ${{ github.sha }}"
+    # Step 4: Fetch the changed files between commits
+    - name: Fetch changed files
+      id: fetch_changes
+      run: |
+        echo "Before commit: ${{ github.event.before }}"
+        echo "Current commit: ${{ github.sha }}"
 
-    #     # Ensure the "before" commit exists. Use HEAD~1 if it's missing (e.g., in case of the first commit).
-    #     before_commit="${{ github.event.before }}"
-    #     if [ -z "$before_commit" ]; then
-    #       echo "No before commit, falling back to HEAD~1"
-    #       before_commit="HEAD~1"
-    #     fi
-    #     echo "Using before commit: $before_commit"
+        # Ensure the "before" commit exists. Use HEAD~1 if it's missing (e.g., in case of the first commit).
+        before_commit="${{ github.event.before }}"
+        if [ -z "$before_commit" ]; then
+          echo "No before commit, falling back to HEAD~1"
+          before_commit="HEAD~1"
+        fi
+        echo "Using before commit: $before_commit"
 
-    #     # Fetch full commit history to ensure all commits are available
-    #     echo "Fetching full commit history..."
-    #     git fetch --prune --unshallow
+        # Fetch full commit history to ensure all commits are available
+        echo "Fetching full commit history..."
+        git fetch --prune --unshallow
 
-    #     # Get the list of changed files between the before commit and the current commit
-    #     changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
-    #     echo "Changed files:"
-    #     echo "$changed_files"
+        # Get the list of changed files between the before commit and the current commit
+        changed_files=$(git diff --name-only $before_commit ${{ github.sha }})
+        echo "Changed files:"
+        echo "$changed_files"
 
-    #     # Replace newlines with spaces and sanitize file names
-    #     sanitized_changed_files=$(echo "$changed_files" | tr '\n' ' ')
+        # Replace newlines with spaces and sanitize file names
+        sanitized_changed_files=$(echo "$changed_files" | tr '\n' ' ')
 
-    #     # Set the sanitized list of changed files as an environment variable
-    #     echo "changed_files=$sanitized_changed_files" >> $GITHUB_ENV
+        # Set the sanitized list of changed files as an environment variable
+        echo "changed_files=$sanitized_changed_files" >> $GITHUB_ENV
 
+    # Step 5: Cache SAM build artifacts for Python functions
+    - name: Cache Python SAM build artifacts
+      uses: actions/cache@v2
+      with:
+        path: lambda-functions/python/*/.aws-sam
+        key: ${{ runner.os }}-python-${{ hashFiles('lambda-functions/python/*/src/**') }}
+        restore-keys: |
+          ${{ runner.os }}-python-
 
-    # # Step 5: Build Python functions if changed
-    # - name: Build Python functions if changed
-    #   run: |
+    # Step 6: Build Python functions if changed
+    - name: Build Python functions if changed
+      run: |
+        # Convert the output string (changed_files) to an array
+        IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
-    #     # Convert the output string (changed_files) to an array
-    #     IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+        # Initialize an empty array to store the changed Python function names
+        changed_functions=()
 
-    #     echo "${changed_files_array[@]}"
-    #     # Initialize an empty array to store the changed Python function names
-    #     changed_functions=()
-
-    #     # Loop through the array and check for changes in specific directories
-    #     for file in "${changed_files_array[@]}"; do
-    #       echo "Processing file: $file"
+        # Loop through the array and check for changes in specific directories
+        for file in "${changed_files_array[@]}"; do
+          echo "Processing file: $file"
     
-    #       # Check if the file is inside the 'python/src/' directory
-    #       if [[ "$file" == python/src/* ]]; then
-    #         # Extract the function name from the file path 
-    #         function_name=$(echo "$file" | cut -d '/' -f 3)  
-    #         echo "Detected change in Python function: $function_name"
+          # Check if the file is inside the 'python/src/' directory
+          if [[ "$file" == python/src/* ]]; then
+            # Extract the function name from the file path 
+            function_name=$(echo "$file" | cut -d '/' -f 3)  
+            echo "Detected change in Python function: $function_name"
 
-    #         # Add the function name to the list if not already included
-    #         if [[ ! " ${changed_functions[@]} " =~ " ${function_name} " ]]; then
-    #           changed_functions+=("$function_name")
-    #         fi
-    #       fi
-    #     done
+            # Add the function name to the list if not already included
+            if [[ ! " ${changed_functions[@]} " =~ " ${function_name} " ]]; then
+              changed_functions+=("$function_name")
+            fi
+          fi
+        done
 
-    #     # Log the functions that need to be built
-    #     echo "Changed Python functions to build: ${changed_functions[@]}"
+        # Log the functions that need to be built
+        echo "Changed Python functions to build: ${changed_functions[@]}"
 
-    #     # Build only the changed Python functions (if any)
-    #     if [ ${#changed_functions[@]} -gt 0 ]; then
-    #       for function in "${changed_functions[@]}"; do
-    #         echo "Building Python function: $function"
-    #         cd python
-    #         sam build $function --use-container
-    #       done
-    #     else
-    #       echo "No changes detected in Python functions"
-    #     fi
+        # Build only the changed Python functions (if any)
+        if [ ${#changed_functions[@]} -gt 0 ]; then
+          for function in "${changed_functions[@]}"; do
+            echo "Building Python function: $function"
+            cd lambda-functions/python/$function
+            sam build --use-container
+          done
+        else
+          echo "No changes detected in Python functions"
+        fi
 
-    # # Step 6: Build Java functions if changed
-    # - name: Build Java functions if changed
-    #   run: |
-    #     # Convert the output string (changed_files) to an array
-    #     IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+    # Step 7: Cache SAM build artifacts for Java functions
+    - name: Cache Java SAM build artifacts
+      uses: actions/cache@v2
+      with:
+        path: lambda-functions/java/*/.aws-sam
+        key: ${{ runner.os }}-java-${{ hashFiles('lambda-functions/java/*/src/**') }}
+        restore-keys: |
+          ${{ runner.os }}-java-
 
-    #     # Initialize an empty array to store the changed Java function names
-    #     changed_functions=()
+    # Step 8: Build Java functions if changed
+    - name: Build Java functions if changed
+      run: |
+        # Convert the output string (changed_files) to an array
+        IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
-    #     # Loop through the array and check for changes in specific directories
-    #     for file in "${changed_files_array[@]}"; do
-    #       echo "Processing file: $file"
+        # Initialize an empty array to store the changed Java function names
+        changed_functions=()
+
+        # Loop through the array and check for changes in specific directories
+        for file in "${changed_files_array[@]}"; do
+          echo "Processing file: $file"
     
-    #       # Check if the file is inside the 'java/src/' directory
-    #       if [[ "$file" == java/src/* ]]; then
-    #         # Extract the function name from the file path 
-    #         function_name=$(echo "$file" | cut -d '/' -f 3)  
-    #         echo "Detected change in Java function: $function_name"
+          # Check if the file is inside the 'java/src/' directory
+          if [[ "$file" == java/src/* ]]; then
+            # Extract the function name from the file path 
+            function_name=$(echo "$file" | cut -d '/' -f 3)  
+            echo "Detected change in Java function: $function_name"
 
-    #         # Add the function name to the list if not already included
-    #         if [[ ! " ${changed_functions[@]} " =~ " ${function_name} " ]]; then
-    #           changed_functions+=("$function_name")
-    #         fi
-    #       fi
-    #     done
+            # Add the function name to the list if not already included
+            if [[ ! " ${changed_functions[@]} " =~ " ${function_name} " ]]; then
+              changed_functions+=("$function_name")
+            fi
+          fi
+        done
 
-    #     # Log the functions that need to be built
-    #     echo "Changed Java functions to build: ${changed_functions[@]}"
+        # Log the functions that need to be built
+        echo "Changed Java functions to build: ${changed_functions[@]}"
 
-    #     # Build only the changed Java functions (if any)
-    #     if [ ${#changed_functions[@]} -gt 0 ]; then
-    #       for function in "${changed_functions[@]}"; do
-    #         echo "Building Java function: $function"
-    #         cd java
-    #         sam build $function --use-container
-    #       done
-    #     else
-    #       echo "No changes detected in Java functions"
-    #     fi
+        # Build only the changed Java functions (if any)
+        if [ ${#changed_functions[@]} -gt 0 ]; then
+          for function in "${changed_functions[@]}"; do
+            echo "Building Java function: $function"
+            cd lambda-functions/java/$function
+            sam build --use-container
+          done
+        else
+          echo "No changes detected in Java functions"
+        fi
 
-    # # Step 7: Build Node.js functions if changed
-    # - name: Build Node.js functions if changed
-    #   run: |
-    #     # Convert the output string (changed_files) to an array
-    #     IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+    # Step 9: Cache SAM build artifacts for Node.js functions
+    - name: Cache Node.js SAM build artifacts
+      uses: actions/cache@v2
+      with:
+        path: lambda-functions/nodejs/*/.aws-sam
+        key: ${{ runner.os }}-nodejs-${{ hashFiles('lambda-functions/nodejs/*/src/**') }}
+        restore-keys: |
+          ${{ runner.os }}-nodejs-
 
-    #     # Initialize an empty array to store the changed Node.js function names
-    #     changed_functions=()
+    # Step 10: Build Node.js functions if changed
+    - name: Build Node.js functions if changed
+      run: |
+        # Convert the output string (changed_files) to an array
+        IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
-    #     # Loop through the array and check for changes in specific directories
-    #     for file in "${changed_files_array[@]}"; do
-    #       echo "Processing file: $file"
+        # Initialize an empty array to store the changed Node.js function names
+        changed_functions=()
+
+        # Loop through the array and check for changes in specific directories
+        for file in "${changed_files_array[@]}"; do
+          echo "Processing file: $file"
     
-    #       # Check if the file is inside the 'node-js/src/' directory
-    #       if [[ "$file" == node-js/src/* ]]; then
-    #         # Extract the function name from the file path 
-    #         function_name=$(echo "$file" | cut -d '/' -f 3)  
-    #         echo "Detected change in Node.js function: $function_name"
+          # Check if the file is inside the 'node-js/src/' directory
+          if [[ "$file" == node-js/src/* ]]; then
+            # Extract the function name from the file path 
+            function_name=$(echo "$file" | cut -d '/' -f 3)  
+            echo "Detected change in Node.js function: $function_name"
 
-    #         # Add the function name to the list if not already included
-    #         if [[ ! " ${changed_functions[@]} " =~ " ${function_name} " ]]; then
-    #           changed_functions+=("$function_name")
-    #         fi
-    #       fi
-    #     done
+            # Add the function name to the list if not already included
+            if [[ ! " ${changed_functions[@]} " =~ " ${function_name} " ]]; then
+              changed_functions+=("$function_name")
+            fi
+          fi
+        done
 
-    #     # Log the functions that need to be built
-    #     echo "Changed Node.js functions to build: ${changed_functions[@]}"
+        # Log the functions that need to be built
+        echo "Changed Node.js functions to build: ${changed_functions[@]}"
 
-    #     # Build only the changed Node.js functions (if any)
-    #     if [ ${#changed_functions[@]} -gt 0 ]; then
-    #       for function in "${changed_functions[@]}"; do
-    #         echo "Building Node.js function: $function"
-    #         cd node-js
-    #         sam build $function --use-container
-    #       done
-    #     else
-    #       echo "No changes detected in Node.js functions"
-    #     fi
+        # Build only the changed Node.js functions (if any)
+        if [ ${#changed_functions[@]} -gt 0 ]; then
+          for function in "${changed_functions[@]}"; do
+            echo "Building Node.js function: $function"
+            cd lambda-functions/nodejs/$function
+            sam build --use-container
+          done
+        else
+          echo "No changes detected in Node.js functions"
+        fi
 
-    # # Step 8: Build C# functions if changed
-    # - name: Build C# functions if changed
-    #   run: |
-    #     # Convert the output string (changed_files) to an array
-    #     IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
+    # Step 11: Cache SAM build artifacts for C# functions
+    - name: Cache C# SAM build artifacts
+      uses: actions/cache@v2
+      with:
+        path: lambda-functions/csharp/*/.aws-sam
+        key: ${{ runner.os }}-csharp-${{ hashFiles('lambda-functions/csharp/*/src/**') }}
+        restore-keys: |
+          ${{ runner.os }}-csharp-
 
-    #     # Initialize an empty array to store the changed C# function names
-    #     changed_functions=()
+    # Step 12: Build C# functions if changed
+    - name: Build C# functions if changed
+      run: |
+        # Convert the output string (changed_files) to an array
+        IFS=$' ' read -r -a changed_files_array <<< "${{ env.changed_files }}"
 
-    #     # Loop through the array and check for changes in specific directories
-    #     for file in "${changed_files_array[@]}"; do
-    #       echo "Processing file: $file"
+        # Initialize an empty array to store the changed C# function names
+        changed_functions=()
+
+        # Loop through the array and check for changes in specific directories
+        for file in "${changed_files_array[@]}"; do
+          echo "Processing file: $file"
     
-    #       # Check if the file is inside the 'c-sharp/src/' directory
-    #       if [[ "$file" == c-sharp/src/* ]]; then
-    #         # Extract the function name from the file path 
-    #         function_name=$(echo "$file" | cut -d '/' -f 3)  
-    #         echo "Detected change in C# function: $function_name"
+          # Check if the file is inside the 'c-sharp/src/' directory
+          if [[ "$file" == c-sharp/src/* ]]; then
+            # Extract the function name from the file path 
+            function_name=$(echo "$file" | cut -d '/' -f 3)  
+            echo "Detected change in C# function: $function_name"
 
-    #         # Add the function name to the list if not already included
-    #         if [[ ! " ${changed_functions[@]} " =~ " ${function_name} " ]]; then
-    #           changed_functions+=("$function_name")
-    #         fi
-    #       fi
-    #     done
+            # Add the function name to the list if not already included
+            if [[ ! " ${changed_functions[@]} " =~ " ${function_name} " ]]; then
+              changed_functions+=("$function_name")
+            fi
+          fi
+        done
 
-    #     # Log the functions that need to be built
-    #     echo "Changed C# functions to build: ${changed_functions[@]}"
-
-    #     # Build only the changed C# functions (if any)
-    #     if [ ${#changed_functions[@]} -gt 0 ]; then
-    #       for function in "${changed_functions[@]}"; do
-    #         echo "Building C# function: $function"
-    #         cd c-sharp
-    #         sam build $function --use-container --mount-with WRITE
-    #       done
-    #     else
-    #       echo "No changes detected in C# functions"
-    #     fi
-
-    # Step 9: Deploy python function
+      # Step 9: Deploy the functions
     - name: Deploy Updated Functions
       run: |
         # Deploy all functions that were built
         cd python
-        sam build --use-container
         sam deploy 
-        # cd c-sharp
-        # sam build --use-container --mount-with WRITE
-        # sam deploy
+        cd ../c-sharp
+        sam deploy
         # cd ../java
         # sam deploy
         # cd ../node-js
