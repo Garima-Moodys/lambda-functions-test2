@@ -73,14 +73,14 @@ jobs:
       run: |
         cd python
         sam build --use-container
-        sam deploy
+        sam deploy --no-fail-on-empty-changeset
 
     # Step 7: Deploy C-Sharp
     - name: Deploy C-Sharp Functions
       run: |
         cd c-sharp
-        sam build --use-container
-        sam deploy
+        sam build --use-container --mount-with WRITE
+        sam deploy --no-fail-on-empty-changeset
 
     # # Step 8: Deploy Java Functions
     # - name: Deploy Java Functions
