@@ -16,6 +16,7 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 resolve_s3 = true
+s3_prefix = "c-sharp"
 region = "us-east-1"
 
 [default.package.parameters]

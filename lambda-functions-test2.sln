@@ -1,0 +1,32 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "c-sharp", "c-sharp", "{8DD2837E-F460-30ED-8E5F-5B31E8047072}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8B96A449-1CD2-8900-018C-FB96A6324EBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Function", "c-sharp\src\Function\Function.csproj", "{65B91075-F94C-A45E-3E18-C03BF32A0E1D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{65B91075-F94C-A45E-3E18-C03BF32A0E1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65B91075-F94C-A45E-3E18-C03BF32A0E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65B91075-F94C-A45E-3E18-C03BF32A0E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65B91075-F94C-A45E-3E18-C03BF32A0E1D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8B96A449-1CD2-8900-018C-FB96A6324EBD} = {8DD2837E-F460-30ED-8E5F-5B31E8047072}
+		{65B91075-F94C-A45E-3E18-C03BF32A0E1D} = {8B96A449-1CD2-8900-018C-FB96A6324EBD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1322CF9D-C61C-4794-A498-6F1C515120A9}
+	EndGlobalSection
+EndGlobal

@@ -12,6 +12,7 @@ Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: c-sharp-function1-sam-test
       Description: !Sub
         - Stack ${AWS::StackName} Function ${ResourceName}
         - ResourceName: Function
