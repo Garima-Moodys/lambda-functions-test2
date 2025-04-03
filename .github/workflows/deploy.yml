@@ -231,12 +231,12 @@ jobs:
     - name: Deploy Updated Functions
       run: |
         # Deploy all functions that were built
-        # cd python
-        # sam build --use-container
-        # sam deploy 
-        cd c-sharp
-        sam build --use-container --mount-with WRITE
-        sam deploy
+        cd python
+        sam build --use-container
+        sam deploy 
+        # cd c-sharp
+        # sam build --use-container --mount-with WRITE
+        # sam deploy
         # cd ../java
         # sam deploy
         # cd ../node-js

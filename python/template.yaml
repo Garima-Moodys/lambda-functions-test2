@@ -28,19 +28,27 @@ Resources:
           - sg-01979a55a831a51ac
         SubnetIds:
           - subnet-06d47cc103b00d8df
-          - subnet-0e06d2b7a43c2f810 
-      Layers: 
-          - arn:aws:lambda:us-east-1:933489381270:layer:pyodbc_layer:7
-          - arn:aws:lambda:us-east-1:933489381270:layer:openpyxl-layer:1
+          - subnet-0e06d2b7a43c2f810
+      Layers:
+        - arn:aws:lambda:us-east-1:933489381270:layer:pyodbc_layer:7
+        - arn:aws:lambda:us-east-1:933489381270:layer:openpyxl-layer:1
       Environment:
         Variables:
-          DB_NAME: "LoanDQ"
-          DB_PASSWORD: "ZGY5Nzg0MDg3YWN"
-          DB_SERVER: "ptc-wbafgdb312"
-          DB_USER: "loandq_user"
-          s3_bucket_name: "aws-lambda-functions-bucket-excel"
-  # FunctionLogGroup:
-  #   Type: AWS::Logs::LogGroup
-  #   Properties:
-  #     LogGroupName: !Sub /aws/lambda/${Function}
+          DB_NAME: LoanDQ
+          DB_PASSWORD: ZGY5Nzg0MDg3YWN
+          DB_SERVER: ptc-wbafgdb312
+          DB_USER: loandq_user
+          s3_bucket_name: aws-lambda-functions-bucket-excel
+  Function2:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Function2
+      CodeUri: src/Function2
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
   
