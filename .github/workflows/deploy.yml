@@ -65,7 +65,7 @@ jobs:
 
     # Step 5: Cache SAM build artifacts for Python functions
     - name: Cache Python SAM build artifacts
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: lambda-functions/python/*/.aws-sam
         key: ${{ runner.os }}-python-${{ hashFiles('lambda-functions/python/*/src/**') }}
