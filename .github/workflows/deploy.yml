@@ -227,7 +227,7 @@ jobs:
     #       echo "No changes detected in C# functions"
     #     fi
 
-    # Step 9: Deploy the functions
+    # Step 9: Deploy python function
     - name: Deploy Updated Functions
       run: |
         # Deploy all functions that were built
