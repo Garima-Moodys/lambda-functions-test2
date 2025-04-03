@@ -231,9 +231,9 @@ jobs:
     - name: Deploy Updated Functions
       run: |
         # Deploy all functions that were built
-        cd python
-        sam build --use-container
-        sam deploy 
+        # cd python
+        # sam build --use-container
+        # sam deploy 
         cd ../c-sharp
         sam build --use-container
         sam deploy
