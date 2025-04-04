@@ -54,6 +54,7 @@ Resources:
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
+      Role: arn:aws:iam::933489381270:role/AWSNetworkLambdaServiceRole
   Function2LogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
