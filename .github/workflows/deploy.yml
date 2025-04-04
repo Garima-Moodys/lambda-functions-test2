@@ -73,7 +73,10 @@ jobs:
       run: |
         cd python
         sam build --use-container
-        sam deploy --no-fail-on-empty-changeset || aws cloudformation cancel-update-stack --stack-name python --region us-east-1
+        if ! sam deploy --no-fail-on-empty-changeset; then
+          aws cloudformation cancel-update-stack --stack-name python --region ${{ secrets.AWS_REGION }}
+          exit 1  # Ensure the pipeline fails and stops execution
+        fi
 
 
     # Step 7: Deploy C-Sharp
@@ -81,18 +84,27 @@ jobs:
       run: |
         cd c-sharp
         sam build --use-container --mount-with WRITE
-        sam deploy --no-fail-on-empty-changeset || aws cloudformation cancel-update-stack --stack-name c-sharp --region us-east-1
+        if ! sam deploy --no-fail-on-empty-changeset; then
+          aws cloudformation cancel-update-stack --stack-name c-sharp --region ${{ secrets.AWS_REGION }}
+          exit 1  # Ensure the pipeline fails and stops execution
+        fi
 
     # Step 8: Deploy Java Functions
     - name: Deploy Java Functions
       run: |
         cd java
         sam build --use-container
-        sam deploy --no-fail-on-empty-changeset || aws cloudformation cancel-update-stack --stack-name java --region us-east-1
+        if ! sam deploy --no-fail-on-empty-changeset; then
+          aws cloudformation cancel-update-stack --stack-name java --region ${{ secrets.AWS_REGION }}
+          exit 1  # Ensure the pipeline fails and stops execution
+        fi
 
     # Step 9: Deploy Node.js Functions
     - name: Deploy Node.js Functions
       run: |
         cd node-js
         sam build --use-container
-        sam deploy --no-fail-on-empty-changeset || aws cloudformation cancel-update-stack --stack-name node-js --region us-east-1
+        if ! sam deploy --no-fail-on-empty-changeset; then
+          aws cloudformation cancel-update-stack --stack-name node-js --region ${{ secrets.AWS_REGION }}
+          exit 1  # Ensure the pipeline fails and stops execution
+        fi
