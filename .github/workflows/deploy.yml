@@ -82,16 +82,16 @@ jobs:
         sam build --use-container --mount-with WRITE
         sam deploy --no-fail-on-empty-changeset
 
-    # # Step 8: Deploy Java Functions
-    # - name: Deploy Java Functions
-    #   run: |
-    #     cd java
-    #     sam build --use-container
-    #     sam deploy
+    # Step 8: Deploy Java Functions
+    - name: Deploy Java Functions
+      run: |
+        cd java
+        sam build --use-container
+        sam deploy
 
-    # # Step 9: Deploy Node.js Functions
-    # - name: Deploy Node.js Functions
-    #   run: |
-    #     cd node-js
-    #     sam build --use-container
-    #     sam deploy
+    # Step 9: Deploy Node.js Functions
+    - name: Deploy Node.js Functions
+      run: |
+        cd node-js
+        sam build --use-container
+        sam deploy
