@@ -87,11 +87,11 @@ jobs:
       run: |
         cd java
         sam build --use-container
-        sam deploy
+        sam deploy --no-fail-on-empty-changeset
 
     # Step 9: Deploy Node.js Functions
     - name: Deploy Node.js Functions
       run: |
         cd node-js
         sam build --use-container
-        sam deploy
+        sam deploy --no-fail-on-empty-changeset
