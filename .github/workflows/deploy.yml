@@ -9,7 +9,8 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
-    fail-fast: true
+    strategy:
+      fail-fast: true
 
     steps:
     # Step 1: Check out the repository code
