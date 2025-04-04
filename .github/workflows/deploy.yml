@@ -40,7 +40,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: python/.aws-sam
-        key: ${{ runner.os }}-python-${{ hashFiles('python/.aws-sam/**/*') }}
+        key: ${{ runner.os }}-python-${{ hashFiles('python/template.yaml', 'python/src/**/*') }}
         restore-keys: |
           ${{ runner.os }}-python-
 
@@ -48,7 +48,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: c-sharp/.aws-sam
-        key: ${{ runner.os }}-c-sharp-${{ hashFiles('c-sharp/.aws-sam/**/*') }}
+        key: ${{ runner.os }}-c-sharp-${{ hashFiles('c-sharp/template.yaml', 'c-sharp/src/**/*') }}
         restore-keys: |
           ${{ runner.os }}-c-sharp-
 
@@ -56,7 +56,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: java/.aws-sam
-        key: ${{ runner.os }}-java-${{ hashFiles('java/.aws-sam/**/*') }}
+        key: ${{ runner.os }}-java-${{ hashFiles('java/template.yaml', 'java/src/**/*') }}
         restore-keys: |
           ${{ runner.os }}-java-
 
@@ -64,7 +64,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: node-js/.aws-sam
-        key: ${{ runner.os }}-node-js-${{ hashFiles('node-js/.aws-sam/**/*') }}
+        key: ${{ runner.os }}-node-js-${{ hashFiles('node-js/template.yaml', 'node-js/src/**/*') }}
         restore-keys: |
           ${{ runner.os }}-node-js-
 
