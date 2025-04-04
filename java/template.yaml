@@ -55,8 +55,4 @@ Resources:
       Timeout: 30
       Tracing: Active
       Role: arn:aws:iam::933489381270:role/AWSNetworkLambdaServiceRole
-  Function2LogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${Function2}
+  
