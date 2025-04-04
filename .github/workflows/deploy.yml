@@ -15,11 +15,11 @@ jobs:
     steps:
     # Step 1: Check out the repository code
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     # Step 2: Set up AWS credentials
     - name: Set up AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v3
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -27,7 +27,7 @@ jobs:
 
     # Step 3: Set up Python environment
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.x'  
 
@@ -70,7 +70,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-js-
 
-    # Step 6: Build and deploy Python function
+    # Step 6: Build and Deploy Python Functions
     - name: Deploy Updated Python Functions
       run: |
         cd python
@@ -78,21 +78,21 @@ jobs:
         sam deploy --no-fail-on-empty-changeset
 
 
-    # Step 7: Deploy C-Sharp
+    # Step 7: Build and Deploy C-Sharp Functions
     - name: Deploy C-Sharp Functions
       run: |
         cd c-sharp
         sam build --use-container --mount-with WRITE
         sam deploy --no-fail-on-empty-changeset
 
-    # Step 8: Deploy Java Functions
+    # Step 8: Build and Deploy Java Functions
     - name: Deploy Java Functions
       run: |
         cd java
         sam build --use-container
         sam deploy --no-fail-on-empty-changeset
 
-    # Step 9: Deploy Node.js Functions
+    # Step 9: Build and Deploy Node.js Functions
     - name: Deploy Node.js Functions
       run: |
         cd node-js
